@@ -238,6 +238,11 @@ namespace AutoCompare.Compilation
             if (isField && !configuration.CompareFields)
                 return false;
 
+            if(configuration.IgnoredTypes.Contains(member.GetType()))
+            {
+                return false;
+            }
+
             var memberConfiguration = configuration.GetMemberConfiguration(member.Name);
             return !memberConfiguration.Ignored;
         }

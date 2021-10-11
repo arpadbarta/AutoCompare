@@ -9,19 +9,22 @@ namespace AutoCompare.Configuration
 {
     internal class ComparerConfiguration
     {
-        protected Dictionary<string, MemberConfiguration> _memberConfigs = new Dictionary<string, MemberConfiguration>();
+        protected Dictionary<string, MemberConfiguration> MemberConfigurations { get; }
 
-        public IComparerEngine Engine { get; private set; }
-        public bool CompareFields { get; protected set; } = false;
+        public IComparerEngine Engine { get; }
+        public bool CompareFields { get; protected set; }
+        public HashSet<Type> IgnoredTypes { get; }
 
         public ComparerConfiguration(IComparerEngine engine)
         {
             Engine = engine;
+            IgnoredTypes = new HashSet<Type>();
+            MemberConfigurations = new Dictionary<string, MemberConfiguration>();
         }
 
         public MemberConfiguration GetMemberConfiguration(string memberName)
         {
-            return _memberConfigs.ContainsKey(memberName) ? _memberConfigs[memberName] : new MemberConfiguration();
+            return MemberConfigurations.ContainsKey(memberName) ? MemberConfigurations[memberName] : new MemberConfiguration();
         }
     }
 
@@ -38,28 +41,34 @@ namespace AutoCompare.Configuration
             return this;
         }
 
+        public IComparerConfiguration<T> IgnoreMemberType<TMemberType>()
+        {
+            IgnoredTypes.Add(typeof(TMemberType));
+            return this;
+        }
+
         public IComparerConfiguration<T> For<TMember>(Expression<Func<T, TMember>> member, Action<IMemberConfiguration> configuration)
         {
             var memberInfo = ReflectionHelper.GetMemberInfo(member);
-            if (_memberConfigs.ContainsKey(memberInfo.Name))
+            if (MemberConfigurations.ContainsKey(memberInfo.Name))
             {
                 throw new Exception($"The member {memberInfo.Name} is already configured.");
             }
             var config = new MemberConfiguration();
             configuration(config);
-            _memberConfigs.Add(memberInfo.Name, config);
+            MemberConfigurations.Add(memberInfo.Name, config);
             return this;
         }
 
         private IComparerConfiguration<T> ForEnumerableInternal<TMember>(string memberName, Action<IEnumerableConfiguration<TMember>> configuration) where TMember : class
         {
-            if (_memberConfigs.ContainsKey(memberName))
+            if (MemberConfigurations.ContainsKey(memberName))
             {
                 throw new Exception($"The member {memberName} is already configured.");
             }
             var config = new EnumerableConfiguration<TMember>();
             configuration(config);
-            _memberConfigs.Add(memberName, config);
+            MemberConfigurations.Add(memberName, config);
             return this;
         }
 

@@ -17,6 +17,12 @@ namespace AutoCompare.Configuration
         IComparerConfiguration<T> ComparePublicFields();
 
         /// <summary>
+        /// By default, all types are compared. Call this to disable comparison for specific types.
+        /// </summary>
+        /// <typeparam name="TMemberType">Type which should be ignored.</typeparam>
+        IComparerConfiguration<T> IgnoreMemberType<TMemberType>();
+
+        /// <summary>
         /// Configures how the engine handles the specified member
         /// </summary>
         /// <typeparam name="TMember"></typeparam>

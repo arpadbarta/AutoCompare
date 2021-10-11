@@ -362,5 +362,35 @@ namespace AutoCompare.Tests
             var diff = SutEngine.Compare(oldModel, newModel);
             Assert.AreEqual(0, diff.Count);
         }
+
+
+        [TestMethod]
+        public void IgnoreMemberType_GivenString_ThenIgnoresTheStringProperties()
+        {
+            SutEngine.Configure<SimpleModel>()
+                .IgnoreMemberType<string>()
+                .IgnoreMemberType<List<int>>();
+
+            var oldModel = new PublicFieldsModel()
+            {
+                Id = 1,
+                Check = false,
+                Name = "Name",
+                Values = new List<int>() { 1, 2, 3, 4 },
+                Ignored = 5,
+            };
+
+            var newModel = new PublicFieldsModel()
+            {
+                Id = 1,
+                Check = false,
+                Name = "Name 2",
+                Values = new List<int>() {1, 2, 3, 4, 5, 6, 7 },
+                Ignored = 5,
+            };
+
+            var diff = SutEngine.Compare(oldModel, newModel);
+            Assert.AreEqual(0, diff.Count);
+        }
     }
 }
