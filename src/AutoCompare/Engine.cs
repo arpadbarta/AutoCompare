@@ -8,7 +8,7 @@ namespace AutoCompare
     /// <summary>
     /// AutoCompare engine. Handles type configuration, compilation and cache
     /// </summary>
-    public class Engine : IComparerEngine, IBuilderEngine
+    public class Engine : IBuilderEngine
     {
         private readonly Dictionary<Type, object> _comparerCache = new Dictionary<Type, object>();
 
@@ -57,8 +57,7 @@ namespace AutoCompare
         public CompiledComparer<T> Get<T>() where T : class
         {
             var type = typeof(T);
-            object comparer;
-            if (_comparerCache.TryGetValue(type, out comparer))
+            if (_comparerCache.TryGetValue(type, out var comparer))
             {
                 return (CompiledComparer<T>)comparer;
             }
